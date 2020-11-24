@@ -1,0 +1,22 @@
+<main class="app-container">
+   <div class="search">
+      <section class="block search__input">
+         <label class="form-label">Query</label>
+         <textarea class="form-control" rows="10" [(ngModel)]="query"></textarea>
+         <button class="btn btn-primary mt-2" (click)="search()">search (2x duwen)</button>
+      </section>
+      <section class="block search__result">
+         <ul class="list-group">
+            <li class="list-group-item" *ngFor="let item of subject | async">
+               {{item}}
+            </li>
+         </ul>
+      </section>
+   </div>
+   <div>
+      <section leaflet
+               class="map"
+               [leafletOptions]="options">
+      </section>
+   </div>
+</main>
