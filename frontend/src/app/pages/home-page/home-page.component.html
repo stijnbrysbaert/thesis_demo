@@ -6,6 +6,7 @@
          <button class="btn btn-primary mt-2" (click)="search()">search (2x duwen)</button>
       </section>
       <section class="block search__result">
+         <label class="form-label">Results</label>
          <ul class="list-group">
             <li class="list-group-item" *ngFor="let item of subject | async">
                {{item}}
@@ -14,9 +15,11 @@
       </section>
    </div>
    <div>
-      <section leaflet
+      <!-- <section leaflet
                class="map"
+               [leafletLayers]="layers"
                [leafletOptions]="options">
-      </section>
+      </section> -->
+      <section id="map"></section>
    </div>
 </main>
