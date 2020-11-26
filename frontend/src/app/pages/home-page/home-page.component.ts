@@ -35,7 +35,7 @@ export class HomePageComponent implements OnInit {
       ?loc geo:lat ?lat .
       ?loc geo:long ?long .
       
-  }LIMIT 100`;
+  }LIMIT 5`;
 
   constructor(
     private comunicaService: ComunicaService,
@@ -69,7 +69,7 @@ export class HomePageComponent implements OnInit {
        });
         items.push(o);
         this.subject.next(items);
-        this.bikeLayer.addData(this.geojsonService.mapObject(o));
+        this.bikeLayer.addData(this.geojsonService.mapObject(o, this.bikeLayer));
       });
     });
   }

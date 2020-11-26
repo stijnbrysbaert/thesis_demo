@@ -18,7 +18,12 @@ export class GeojsonApiService {
   // }
 
 
-  public mapObject(data:any){
+  public mapObject(data:any, layer: any){
+    let content = "";
+    for(const [key, value] of Object.entries(data)){
+      content += `${key}: ${value}<br>`;
+    }
+    layer.bindPopup(content);
     return GeoJSON.parse(data, {Point: ['?lat', '?long']});
   }
 }
