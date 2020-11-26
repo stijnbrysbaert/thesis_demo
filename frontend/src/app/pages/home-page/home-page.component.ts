@@ -16,7 +16,8 @@ export class HomePageComponent implements OnInit {
 
   public observable: Observable<any>;
   public subject = new BehaviorSubject<string[]>([]);
-  public map;
+  private map;
+  public bikeLayer;
   public query: string = `
   PREFIX 	rdfs: <http://www.w3.org/2000/01/rdf-schema#>
   PREFIX 	rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -34,7 +35,7 @@ export class HomePageComponent implements OnInit {
       ?loc geo:lat ?lat .
       ?loc geo:long ?long .
       
-  }`;
+  }LIMIT 100`;
 
   constructor(
     private comunicaService: ComunicaService,
@@ -55,18 +56,7 @@ export class HomePageComponent implements OnInit {
       zoomOffset: -1,
       accessToken: "pk.eyJ1Ijoic2JyeXNiYWUiLCJhIjoiY2tocWVqMWdlMDhsNzJzdDB1eXlxb2FsMiJ9.7y2XQ3jh4gmSBhq5BkaWuw",
     }).addTo(this.map);
-  }
-
-  public addToMap = () => {
-    this.geojsonService.get().subscribe((x: any) => {
-      //waarvoor is dit nodig?
-      // const bikeLayer = L.geoJSON().addTo(map);
-      // bikeLayer.addData(x);
-
-      L.geoJSON(x, {
-        onEachFeature: (feature, layer) => layer.bindPopup(feature.properties.name + '<br>Beschikbaar: ' + feature.properties.beschikbaar)
-      }).addTo(this.map);
-    });
+    this.bikeLayer = L.geoJSON().addTo(this.map);
   }
 
   public search = () => {
@@ -79,8 +69,8 @@ export class HomePageComponent implements OnInit {
        });
         items.push(o);
         this.subject.next(items);
+        this.bikeLayer.addData(this.geojsonService.mapObject(o));
       });
-      this.addToMap();
     });
   }
 }
