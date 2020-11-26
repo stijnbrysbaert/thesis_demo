@@ -9,7 +9,11 @@
          <label class="form-label">Results</label>
          <ul class="list-group">
             <li class="list-group-item" *ngFor="let item of subject | async">
-               {{item}}
+               <ul class="list-group">
+                  <li class="list-group-item" *ngFor="let child of item | keyvalue">
+                     {{child.key}}: {{child.value}}
+                  </li>
+               </ul>
             </li>
          </ul>
       </section>
