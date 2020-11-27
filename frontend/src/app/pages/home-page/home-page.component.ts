@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import * as L from 'leaflet';
-import { BehaviorSubject, Observable } from 'rxjs';
 import { ComunicaService } from 'src/app/services/comunica.service';
 import { GeojsonApiService } from 'src/app/services/geojson-api.service';
+import { finalize } from 'rxjs/operators';
 
 import 'leaflet/dist/images/marker-shadow.png';
 import 'leaflet/dist/images/marker-icon-2x.png';
@@ -10,14 +10,15 @@ import 'leaflet/dist/images/marker-icon-2x.png';
 @Component({
   selector: 'app-home-page',
   templateUrl: './home-page.component.html',
-  styleUrls: ['./home-page.component.scss']
+  styleUrls: ['./home-page.component.scss'],
 })
 export class HomePageComponent implements OnInit {
 
-  public observable: Observable<any>;
-  public subject = new BehaviorSubject<string[]>([]);
   private map;
-  public bikeLayer;
+  public items: any[];
+  public isBusy: boolean;
+  public bikeLayer: L.GeoJSON<any>;
+  public sources: { url: string, isChecked: boolean }[];
   public query: string = `
   PREFIX 	rdfs: <http://www.w3.org/2000/01/rdf-schema#>
   PREFIX 	rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -44,6 +45,11 @@ export class HomePageComponent implements OnInit {
 
   ngOnInit(): void {
     this.initMap();
+    this.initSources();
+  }
+
+  private initSources = () => {
+    this.sources = this.comunicaService.sources.map(x => ({ url: x, isChecked: true }));
   }
 
   private initMap = () => {
@@ -60,17 +66,15 @@ export class HomePageComponent implements OnInit {
   }
 
   public search = () => {
-    let items = [];
-    this.comunicaService.search(this.query).subscribe(result => {
-      result.bindingsStream.on('data', data => {
-        let o = {};
-        data._root.entries.forEach(term => {
-          o[term[0]] = data.get(term[0]).value;
-       });
-        items.push(o);
-        this.subject.next(items);
-        this.bikeLayer.addData(this.geojsonService.mapObject(o, this.bikeLayer));
-      });
+    this.items = [];
+    this.bikeLayer.clearLayers();
+    this.isBusy = true;
+
+    this.comunicaService.search(this.query, this.sources.filter(x => x.isChecked).map(x => x.url)).pipe(
+      finalize(() => this.isBusy = false)
+    ).subscribe(result => {
+      this.items.push(result);
+      this.bikeLayer.addData(this.geojsonService.mapObject(result, this.bikeLayer));
     });
   }
 }

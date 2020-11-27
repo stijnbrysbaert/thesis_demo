@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { from } from 'rxjs';
+import { Injectable, NgZone } from '@angular/core';
+import { Subject } from 'rxjs';
 declare let Comunica: any;
 
 @Injectable({
@@ -7,14 +7,31 @@ declare let Comunica: any;
 })
 export class ComunicaService {
 
-  constructor() { }
+  constructor(private ngZone: NgZone) { }
 
-  public search(query: string) {
-    return from(Comunica.newEngine().query(query, { 
-      sources: [
-      'https://bluebike-mapper.azurewebsites.net/bluebike.ttl',
-      'https://bluebike-mapper.azurewebsites.net/velo.ttl'
-    ] 
-    }) as Promise<any>);
+  public sources = [
+    'https://bluebike-mapper.azurewebsites.net/bluebike.ttl',
+    'https://bluebike-mapper.azurewebsites.net/velo.ttl'
+  ]
+
+  public search(query: string, sources: string[]) {
+    const subject = new Subject()
+
+    Comunica.newEngine().query(query, { sources: sources }).then(result => {
+      result.bindingsStream.on('end', data => {
+        this.ngZone.run(() => subject.complete());
+      });
+  
+      result.bindingsStream.on('data', data => {
+        let o = {};
+        data._root.entries.forEach(term => {
+          o[term[0]] = data.get(term[0]).value;
+        });
+  
+        this.ngZone.run(() => subject.next(o));
+      });
+    });
+    
+    return subject.asObservable();
   }
 }

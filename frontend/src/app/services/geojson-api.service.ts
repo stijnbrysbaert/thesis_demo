@@ -1,8 +1,5 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { from } from 'rxjs';
 declare let GeoJSON: any;
-import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -18,12 +15,12 @@ export class GeojsonApiService {
   // }
 
 
-  public mapObject(data:any, layer: any){
+  public mapObject(data: any, layer: any) {
     let content = "";
-    for(const [key, value] of Object.entries(data)){
+    for (const [key, value] of Object.entries(data)) {
       content += `${key}: ${value}<br>`;
     }
     layer.bindPopup(content);
-    return GeoJSON.parse(data, {Point: ['?lat', '?long']});
+    return GeoJSON.parse(data, { Point: ['?lat', '?long'] });
   }
 }

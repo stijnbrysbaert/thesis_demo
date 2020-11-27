@@ -1,14 +1,22 @@
 <main class="app-container">
    <div class="search">
       <section class="block search__input">
-         <label class="form-label">Query</label>
-         <textarea class="form-control" rows="10" [(ngModel)]="query"></textarea>
-         <button class="btn btn-primary mt-2" (click)="search()">search (2x duwen)</button>
+         <label class="form-label" for="query">Query</label>
+         <textarea class="form-control" rows="12" id="query" [(ngModel)]="query"></textarea>
+         
+         <label class="form-label mt-3">Sources</label>
+         <div *ngFor="let source of sources" class="form-check">
+            <input type="checkbox" class="form-check-input" [id]="source.url" [(ngModel)]="source.isChecked">
+            <label class="form-check-label" [for]="source.url">{{source.url}}</label>
+          </div>
+          
+         <button class="btn btn-primary mt-3" (click)="search()">search</button>
       </section>
       <section class="block search__result">
          <label class="form-label">Results</label>
+         <i class="ml-2 fas fa-circle-notch fa-spin" *ngIf="isBusy"></i>
          <ul class="list-group">
-            <li class="list-group-item" *ngFor="let item of subject | async">
+            <li class="list-group-item" *ngFor="let item of items">
                <ul class="list-group">
                   <li class="list-group-item" *ngFor="let child of item | keyvalue">
                      {{child.key}}: {{child.value}}
