@@ -14,10 +14,9 @@ import { GeojsonApiService } from 'src/app/services/geojson-api.service';
 })
 export class HomePageComponent implements OnInit {
 
-  private map;
+  private map: L.Map;
   public items: any[];
   public isBusy: boolean;
-  public bikeLayer: L.GeoJSON<any>;
   public sources: { url: string, isChecked: boolean }[];
   public query: string = `
   PREFIX 	rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -62,12 +61,11 @@ export class HomePageComponent implements OnInit {
       zoomOffset: -1,
       accessToken: "pk.eyJ1Ijoic2JyeXNiYWUiLCJhIjoiY2tocWVqMWdlMDhsNzJzdDB1eXlxb2FsMiJ9.7y2XQ3jh4gmSBhq5BkaWuw",
     }).addTo(this.map);
-    this.bikeLayer = L.geoJSON().addTo(this.map);
   }
 
   public search = () => {
     this.items = [];
-    this.bikeLayer.clearLayers();
+    // TODO: Remove pin points from map
     this.isBusy = true;
 
     this.comunicaService.search(this.query, this.sources.filter(x => x.isChecked).map(x => x.url)).pipe(
