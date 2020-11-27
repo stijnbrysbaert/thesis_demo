@@ -6,6 +6,7 @@ import { GeojsonApiService } from 'src/app/services/geojson-api.service';
 
 import 'leaflet/dist/images/marker-shadow.png';
 import 'leaflet/dist/images/marker-icon-2x.png';
+import { makeParsedTranslation } from '@angular/localize/src/utils';
 
 @Component({
   selector: 'app-home-page',
@@ -35,7 +36,7 @@ export class HomePageComponent implements OnInit {
       ?loc geo:lat ?lat .
       ?loc geo:long ?long .
       
-  }LIMIT 5`;
+  }`;
 
   constructor(
     private comunicaService: ComunicaService,
@@ -69,7 +70,9 @@ export class HomePageComponent implements OnInit {
        });
         items.push(o);
         this.subject.next(items);
-        this.bikeLayer.addData(this.geojsonService.mapObject(o, this.bikeLayer));
+        L.geoJSON(this.geojsonService.mapObject(o), {
+          onEachFeature : this.geojsonService.addPopup
+        }).addTo(this.map);
       });
     });
   }
