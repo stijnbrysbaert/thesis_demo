@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import * as L from 'leaflet';
+import 'leaflet/dist/images/marker-icon-2x.png';
+import 'leaflet/dist/images/marker-shadow.png';
+import { finalize } from 'rxjs/operators';
 import { ComunicaService } from 'src/app/services/comunica.service';
 import { GeojsonApiService } from 'src/app/services/geojson-api.service';
-import { finalize } from 'rxjs/operators';
 
-import 'leaflet/dist/images/marker-shadow.png';
-import 'leaflet/dist/images/marker-icon-2x.png';
 
 @Component({
   selector: 'app-home-page',
@@ -36,7 +36,7 @@ export class HomePageComponent implements OnInit {
       ?loc geo:lat ?lat .
       ?loc geo:long ?long .
       
-  }LIMIT 5`;
+  }`;
 
   constructor(
     private comunicaService: ComunicaService,
@@ -74,7 +74,9 @@ export class HomePageComponent implements OnInit {
       finalize(() => this.isBusy = false)
     ).subscribe(result => {
       this.items.push(result);
-      this.bikeLayer.addData(this.geojsonService.mapObject(result, this.bikeLayer));
+      L.geoJSON(this.geojsonService.mapObject(result), {
+        onEachFeature: this.geojsonService.addPopup
+      }).addTo(this.map);
     });
   }
 }
