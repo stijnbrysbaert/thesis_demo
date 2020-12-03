@@ -1,5 +1,8 @@
 # ThesisDemo
 
+This demo queries the RDF moddels mapped with https://github.com/stijnbrysbaert/mapper using my RDF ontology: https://stijnbrysbaert.github.io/OSLO-extension/vocabulary.ttl.
+Clone and run the project with the instructions below.
+
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.1.1.
 
 ## Development server
