@@ -18,24 +18,32 @@ export class HomePageComponent implements OnInit {
   public items: any[];
   public isBusy: boolean;
   public sources: { url: string, isChecked: boolean }[];
-  public query: string = `
+  public query: string = `  PREFIX ex: <http://example.org/>
   PREFIX 	rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-  PREFIX 	rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-  PREFIX  locn: <http://www.w3.org/ns/locn#>
-  PREFIX 	geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
-  PREFIX ext:  <https://stijnbrysbaert.github.io/OSLO-extension/vocabulary.ttl#>
-  PREFIX trips: <https://data.vlaanderen.be/ns/mobiliteit/trips-en-aanbod#>
-  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
-  
-  SELECT ?s ?label ?aantal ?lat ?long {
-    ?s rdfs:label ?label .
-      ?s trips:Transportobject.beschikbaarheid ?beschikbaarheid .
-      ?beschikbaarheid ext:voertuigenBeschikbaar ?aantal .
-      ?s locn:geometry ?loc .
-      ?loc geo:lat ?lat .
-      ?loc geo:long ?long .
-      
-  }`;
+    PREFIX 	rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    PREFIX  locn: <http://www.w3.org/ns/locn#>
+    PREFIX 	geo: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+    PREFIX ext:  <https://stijnbrysbaert.github.io/OSLO-extension/vocabulary.ttl#>
+    PREFIX trips: <https://data.vlaanderen.be/ns/mobiliteit/trips-en-aanbod#>
+    PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+    PREFIX geonames: <http://www.geonames.org/ontology#>
+    
+    SELECT ?label ?vehicles ?docks ?type_name ?lat ?long ?nearby ?dienst {
+        ?s a ext:Station ;
+           rdfs:label ?label ;
+           trips:Transportobject.beschikbaarheid ?beschikbaarheid ;
+           locn:geometry ?loc .
+        ?loc geo:lat ?lat .
+        ?loc geo:long ?long .
+        ?beschikbaarheid ext:voertuigTypesBeschikbaar ?vehicles_available ;
+                         ext:voertuigDocksBeschikbaar ?docks_available .
+        ?vehicles_available ext:aantal ?vehicles ;
+                  trips:Resource.vervoermiddel ?type .
+        ?type rdfs:label ?type_name .
+        ?docks_available ext:aantal ?docks .
+        OPTIONAL {?s geonames:nearby ?nearby . }
+        OPTIONAL {?s ext:mobiliteitsdienst ?dienst . }
+    }`;
 
   constructor(
     private comunicaService: ComunicaService,
@@ -49,6 +57,8 @@ export class HomePageComponent implements OnInit {
 
   private initSources = () => {
     this.sources = this.comunicaService.sources.map(x => ({ url: x, isChecked: true }));
+    //laatste datasource niet default op true zetten
+    this.sources[this.sources.length - 1].isChecked = false;
   }
 
   private initMap = () => {
