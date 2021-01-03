@@ -11,7 +11,9 @@ export class ComunicaService {
 
   public sources = [
     'https://bluebike-mapper.azurewebsites.net/bluebike.ttl',
-    'https://bluebike-mapper.azurewebsites.net/velo.ttl'
+    'https://bluebike-mapper.azurewebsites.net/velo.ttl',
+    'https://stijnbrysbaert.github.io/OSLO-extension/vehicle_types.ttl',
+    'https://query.wikidata.org/bigdata/ldf'
   ]
 
   public search(query: string, sources: string[]) {
